@@ -1,0 +1,21 @@
+.main-layout {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .page-content {
+    flex: 1;
+    padding-top: 80px;
+
+    &.home-page {
+      padding-top: 0;
+    }
+  }
+
+  .container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+}
