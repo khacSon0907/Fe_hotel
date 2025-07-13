@@ -1,5 +1,7 @@
 
 import '../styles/components/Footer.scss'
+import appStore from '../assets/appStore.png';
+import googlePlay from '../assets/playstore.png';
 
 export default function Footer() {
   return (
@@ -60,12 +62,11 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Dưới cùng */}
         <div className="footer-bottom">
           <p>Tải ứng dụng Traveloka</p>
           <div className="store-links">
-            <img src="/google-play.png" alt="Google Play" />
-            <img src="/app-store.png" alt="App Store" />
+            <img src={googlePlay} alt="Google Play" />
+            <img src={appStore} alt="App Store" />
           </div>
         </div>
       </div>

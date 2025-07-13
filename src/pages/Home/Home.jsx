@@ -1,6 +1,6 @@
 import React from 'react';
-import '../styles/pages/Home.scss';
-import bgImage from '../assets/Banner.jpg';
+import '../../styles/pages/Home.scss';
+import bgImage from '../../assets/Banner.jpg';
 
 export default function Home() {
   return (

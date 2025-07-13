@@ -1,0 +1,93 @@
+.register-container {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.register-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.register-title {
+  color: #007a7a;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.register-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.star {
+  color: gold;
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.register-input {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.password-group {
+  .register-input {
+    padding-right: 40px;
+  }
+
+  .toggle-eye {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+
+    &:hover {
+      color: #007a7a;
+    }
+  }
+}
+
+.register-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007a7a;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: #005a5a;
+  }
+
+  &.google {
+    background-color: #4285f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background-color: #3367d6;
+    }
+  }
+}
