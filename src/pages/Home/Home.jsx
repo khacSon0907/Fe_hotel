@@ -2,7 +2,17 @@ import React from 'react';
 import '../../styles/pages/Home.scss';
 import bgImage from '../../assets/Banner.jpg';
 
+import { useNavigate } from 'react-router-dom';
+
+
+
 export default function Home() {
+  const navigate = useNavigate();
+
+  const handlSearch= ()=> {
+      navigate("/search-hotel")
+  }
+
   return (
     <div>
       {/* PHẦN HEADER CÓ HÌNH NỀN */}
@@ -15,7 +25,7 @@ export default function Home() {
           <p className="home__subtitle">
             Đặt phòng nhanh chóng – Giá ưu đãi mỗi ngày
           </p>
-          <button className="home__cta-btn">ĐẶT NGAY</button>
+          <button className="home__cta-btn" onClick={handlSearch}>ĐẶT NGAY</button>
         </div>
       </div>
 
