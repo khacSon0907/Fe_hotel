@@ -6,7 +6,7 @@ import "../styles/layouts/MainLayout.scss";
 import { getCurrentUser } from "../services/useService";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../store/userSlice";
-
+import '../styles/Main/main.scss'
 export default function MainLayout() {
   const location = useLocation();
   const isHome = location.pathname === "/";
