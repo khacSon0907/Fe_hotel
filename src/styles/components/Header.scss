@@ -1,8 +1,9 @@
 // Header styles - positioned absolutely over the page
 .header {
+  padding-top: 20px;
   width: 100%;
   position: absolute;
-  top: 20px;
+  top: 0;
   left: 0;
   z-index: 10;
   color: #fff;

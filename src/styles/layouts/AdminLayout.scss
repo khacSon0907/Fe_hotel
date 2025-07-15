@@ -1,0 +1,11 @@
+.admin-layout {
+  display: flex;
+
+  .admin-content {
+    margin-left: 220px; // bằng width sidebar
+    padding: 20px;
+    flex: 1;
+    background: #f5f6fa;
+    min-height: 100vh;
+  }
+}

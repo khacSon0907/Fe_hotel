@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import bannerImg from '../../assets/Banner.jpg';
 import '../../styles/pages/HotelSearchPage.scss';
+
+import { getAllHotels } from '../../services/hotelService';
 
 export default function HotelSearchPage() {
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
   const [ward, setWard] = useState("");
   const [hotels, setHotels] = useState([]);
+  const [allHotels, setAllHotels] = useState([]); // Lưu trữ tất cả hotels từ API
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const districtsData = {
     "Hà Nội": ["Hoàn Kiếm", "Ba Đình", "Đống Đa"],
@@ -19,40 +24,62 @@ export default function HotelSearchPage() {
     "Quận 1": ["Bến Thành", "Nguyễn Thái Bình"],
   };
 
-  const handleSearch = () => {
-    const dummyHotels = [
-      {
-        id: 1,
-        hotelName: "Luxury Hotel",
-        rating: 4.5,
-        description: "Khách sạn sang trọng gần trung tâm thành phố.",
-        city: "Hà Nội",
-        district: "Hoàn Kiếm",
-        ward: "Lê Lợi",
-        image:
-          "https://via.placeholder.com/300x200?text=Luxury",
-      },
-      {
-        id: 2,
-        hotelName: "Cozy Hotel",
-        rating: 3.0,
-        description: "Khách sạn giá tốt, đầy đủ tiện nghi.",
-        city: "TP. HCM",
-        district: "Quận 1",
-        ward: "Bến Thành",
-        image:
-          "https://via.placeholder.com/300x200?text=Cozy",
-      },
-    ];
+  // Fetch hotels từ API khi component mount
+  useEffect(() => {
+    const fetchHotels = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await getAllHotels();
+        console.log("API Response:", response);
+        
+        // Kiểm tra cấu trúc response và lấy data
+        if (response && response.data && Array.isArray(response.data)) {
+          setAllHotels(response.data);
+          setHotels(response.data); // Hiển thị tất cả hotels ban đầu
+        } else if (response && Array.isArray(response)) {
+          setAllHotels(response);
+          setHotels(response);
+        } else {
+          console.error("Unexpected API response structure:", response);
+          setError("Dữ liệu không đúng định dạng");
+        }
+      } catch (error) {
+        console.error("Lỗi gọi API getAllHotels:", error);
+        setError("Không thể tải danh sách khách sạn");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const filtered = dummyHotels.filter(
-      (h) =>
-        (city ? h.city === city : true) &&
-        (district ? h.district === district : true) &&
-        (ward ? h.ward === ward : true)
-    );
+    fetchHotels();
+  }, []);
+
+  // Hàm tìm kiếm hotels
+  const handleSearch = () => {
+    if (!city && !district && !ward) {
+      // Nếu không có filter nào, hiển thị tất cả
+      setHotels(allHotels);
+      return;
+    }
+
+    const filtered = allHotels.filter((hotel) => {
+      const cityMatch = city ? hotel.city === city : true;
+      const districtMatch = district ? hotel.district === district : true;
+      const wardMatch = ward ? hotel.ward === ward : true;
+      
+      return cityMatch && districtMatch && wardMatch;
+    });
 
     setHotels(filtered);
+  };
+
+  // Hàm reset tìm kiếm
+  const handleReset = () => {
+    setCity("");
+    setDistrict("");
+    setWard("");
+    setHotels(allHotels);
   };
 
   return (
@@ -107,28 +134,61 @@ export default function HotelSearchPage() {
             ))}
           </select>
 
-          <button onClick={handleSearch}>ĐẶT NGAY</button>
+          <button onClick={handleSearch}>TÌM KIẾM</button>
+          <button onClick={handleReset} style={{ marginLeft: '10px' }}>
+            RESET
+          </button>
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div className="loading">
+            <p>Đang tải dữ liệu...</p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="error">
+            <p style={{ color: 'red' }}>{error}</p>
+          </div>
+        )}
+
+        {/* Hotels list */}
         <div className="hotel-list">
-          {hotels.map((hotel) => (
+          {!loading && !error && hotels.map((hotel) => (
             <div className="hotel-card" key={hotel.id}>
-              <img src={hotel.image} alt={hotel.hotelName} />
+              <img 
+                src={hotel.images} 
+                alt={hotel.hotelName || hotel.name} 
+              />
               <div className="hotel-info">
-                <div className="hotel-name">{hotel.hotelName}</div>
-                <div className="hotel-rating">
-                  {renderStars(hotel.rating)} ({hotel.rating}/5)
+                <div className="hotel-name">
+                  {hotel.hotelName || hotel.name}
                 </div>
-                <div className="hotel-desc">{hotel.description}</div>
+                <div className="hotel-rating">
+                  {renderStars(hotel.rating || 0)} ({hotel.rating || 0}/5)
+                </div>
+                <div className="hotel-desc">
+                  {hotel.description || 'Không có mô tả'}
+                </div>
                 <div className="hotel-address">
-                  {`Phường ${hotel.ward}, Quận ${hotel.district}, ${hotel.city}`}
+                  {hotel.ward && hotel.district && hotel.city ? 
+                    `Phường ${hotel.ward}, Quận ${hotel.district}, ${hotel.city}` :
+                    hotel.address || 'Địa chỉ không có sẵn'
+                  }
                 </div>
               </div>
             </div>
           ))}
 
-          {hotels.length === 0 && (
-            <p className="no-result">Chưa có kết quả tìm kiếm.</p>
+          {!loading && !error && hotels.length === 0 && (
+            <p className="no-result">
+              {allHotels.length === 0 ? 
+                "Không có dữ liệu khách sạn." : 
+                "Không tìm thấy khách sạn phù hợp với tiêu chí tìm kiếm."
+              }
+            </p>
           )}
         </div>
       </div>
