@@ -1,9 +1,8 @@
 import React from 'react';
 import '../../styles/pages/Home.scss';
-import bgImage from '../../assets/Banner.jpg';
-
+import bgImage from '../../assets/Banner.jpg'; 
 import { useNavigate } from 'react-router-dom';
-
+import  IteamRoom from '../../pages/hotel/IteamRoom'
 
 
 export default function Home() {
@@ -44,6 +43,10 @@ export default function Home() {
           <p>Thưởng thức món ngon 3 miền và quốc tế ngay tại khách sạn.</p>
         </div>
       </div>
+
+
+      <IteamRoom/>
+
     </div>
   );
 }
