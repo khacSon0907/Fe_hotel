@@ -10,10 +10,9 @@ import HotelSearchPage from "../pages/hotel/HotelSearchPage";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminRoute from "./AdminRoute";
 import CreateHotel from "../pages/admin/CreateHotel";
-
+import BookingRoom from '../pages/hotel/BookingRoom'
 import { getCurrentUser } from "../services/useService";
-import { setUser, clearUser } from "../store/userSlice";
-
+import { setUser, clearUser } from "../store/userSlice"
 export default function AppRouter() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
@@ -52,6 +51,7 @@ export default function AppRouter() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search-hotel" element={<HotelSearchPage />} />
+          <Route path="/hotel" element={<BookingRoom/>} />
         </Route>
 
         {/* Auth */}
