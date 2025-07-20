@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import bannerImg from '../../assets/Banner.jpg';
-import '../../styles/pages/HotelSearchPage.scss';
-
-import { getAllHotels } from '../../services/hotelService';
+import bannerImg from "../../assets/Banner.jpg";
+import "../../styles/pages/HotelSearchPage.scss";
+import { useNavigate } from "react-router-dom";
+import { getAllHotels } from "../../services/hotelService";
 
 export default function HotelSearchPage() {
   const [city, setCity] = useState("");
@@ -12,33 +12,59 @@ export default function HotelSearchPage() {
   const [allHotels, setAllHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+ const navigate = useNavigate(); // ✅ Thêm để điều hướng
   const districtsData = {
+    "TP. HCM": [
+      "Quận 1",
+      "Quận 3",
+      "Quận 4",
+      "Quận 5",
+      "Quận 6",
+      "Quận 7",
+      "Quận 8",
+      "Quận 10",
+      "Quận 11",
+      "Quận 12",
+      "Quận Bình Thạnh",
+      "Quận Gò Vấp",
+      "Quận Phú Nhuận",
+      "Quận Tân Bình",
+      "Quận Tân Phú",
+      "Thành phố Thủ Đức",
+      "Huyện Bình Chánh",
+      "Huyện Cần Giờ",
+      "Huyện Củ Chi",
+      "Huyện Hóc Môn",
+      "Huyện Nhà Bè",
+    ],
     "Hà Nội": ["Hoàn Kiếm", "Ba Đình", "Đống Đa", "Thanh Xuân", "Cầu Giấy"],
-    "TP. HCM": ["Quận 1", "Quận 3", "Quận 5", "Quận 7", "Quận Thủ Đức"],
     "Đà Nẵng": ["Hải Châu", "Thanh Khê", "Ngũ Hành Sơn"],
     "Hải Phòng": ["Hồng Bàng", "Lê Chân", "Ngô Quyền"],
     "Cần Thơ": ["Ninh Kiều", "Bình Thủy", "Cái Răng"],
   };
 
   const wardsData = {
-    "Hoàn Kiếm": ["Lê Lợi", "Tràng Tiền", "Hàng Bạc"],
-    "Ba Đình": ["Điện Biên", "Kim Mã", "Ngọc Hà"],
-    "Thanh Xuân": ["Khương Đình", "Hạ Đình", "Thanh Xuân Trung"],
-    "Cầu Giấy": ["Dịch Vọng", "Yên Hòa", "Nghĩa Tân"],
-
-    "Quận 1": ["Bến Thành", "Nguyễn Thái Bình", "Phạm Ngũ Lão"],
-    "Quận 3": ["Phường 4", "Phường 7", "Phường Võ Thị Sáu"],
-    "Quận Thủ Đức": ["Hiệp Bình Phước", "Linh Tây", "Trường Thọ"],
-    
-    "Hải Châu": ["Nam Dương", "Phước Ninh", "Thạch Thang"],
-    "Thanh Khê": ["Tân Chính", "Vĩnh Trung", "Xuân Hà"],
-    
-    "Hồng Bàng": ["Quang Trung", "Phan Bội Châu"],
-    "Lê Chân": ["An Biên", "An Dương"],
-    
-    "Ninh Kiều": ["Tân An", "An Phú"],
-    "Cái Răng": ["Hưng Phú", "Lê Bình"],
+    "Quận 1": ["Bến Nghé", "Bến Thành", "Cầu Kho", "Cầu Ông Lãnh", "Đa Kao", "Nguyễn Thái Bình", "Phạm Ngũ Lão", "Tân Định"],
+    "Quận 3": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường Võ Thị Sáu"],
+    "Quận 4": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 6", "Phường 8", "Phường 9", "Phường 10", "Phường 13", "Phường 14", "Phường 15", "Phường 16", "Phường 18"],
+    "Quận 5": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"],
+    "Quận 6": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14"],
+    "Quận 7": ["Tân Phú", "Tân Thuận Đông", "Tân Thuận Tây", "Tân Kiểng", "Tân Hưng", "Phú Thuận", "Bình Thuận", "Tân Quy", "Tân Phong", "Phú Mỹ"],
+    "Quận 8": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16"],
+    "Quận 10": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"],
+    "Quận 11": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16"],
+    "Quận 12": ["An Phú Đông", "Đông Hưng Thuận", "Hiệp Thành", "Tân Chánh Hiệp", "Tân Thới Hiệp", "Tân Thới Nhất", "Thạnh Lộc", "Thạnh Xuân", "Thới An", "Trung Mỹ Tây"],
+    "Quận Bình Thạnh": ["Phường 1", "Phường 2", "Phường 3", "Phường 5", "Phường 6", "Phường 7", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 17", "Phường 19", "Phường 21", "Phường 22", "Phường 24", "Phường 25", "Phường 26", "Phường 27", "Phường 28"],
+    "Quận Gò Vấp": ["Phường 1", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16", "Phường 17"],
+    "Quận Phú Nhuận": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 13", "Phường 15", "Phường 17"],
+    "Quận Tân Bình": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"],
+    "Quận Tân Phú": ["Phường Tân Sơn Nhì", "Phường Tây Thạnh", "Phường Sơn Kỳ", "Phường Tân Quý", "Phường Tân Thành", "Phường Phú Thọ Hòa", "Phường Phú Thạnh", "Phường Phú Trung", "Phường Hòa Thạnh", "Phường Hiệp Tân", "Phường Tân Thới Hòa"],
+    "Thành phố Thủ Đức": ["Bình Chiểu", "Bình Thọ", "Hiệp Bình Chánh", "Hiệp Bình Phước", "Hiệp Phú", "Linh Chiểu", "Linh Đông", "Linh Tây", "Linh Trung", "Linh Xuân", "Phước Bình", "Phước Long A", "Phước Long B", "Tam Bình", "Tam Phú", "Tăng Nhơn Phú A", "Tăng Nhơn Phú B", "Thạnh Mỹ Lợi", "Thảo Điền", "Trường Thọ"],
+    "Huyện Bình Chánh": ["Bình Chánh", "Bình Hưng", "Bình Lợi", "Đa Phước", "Hưng Long", "Lê Minh Xuân", "Phạm Văn Hai", "Quy Đức", "Tân Kiên", "Tân Nhựt", "Tân Quý Tây", "Tân Túc", "Vĩnh Lộc A", "Vĩnh Lộc B"],
+    "Huyện Cần Giờ": ["An Thới Đông", "Bình Khánh", "Cần Thạnh", "Long Hòa", "Lý Nhơn", "Tam Thôn Hiệp", "Thạnh An"],
+    "Huyện Củ Chi": ["An Nhơn Tây", "An Phú", "Bình Mỹ", "Hòa Phú", "Nhuận Đức", "Phạm Văn Cội", "Phú Hòa Đông", "Phú Mỹ Hưng", "Phước Hiệp", "Phước Thạnh", "Phước Vĩnh An", "Tân An Hội", "Tân Phú Trung", "Tân Thông Hội", "Thái Mỹ", "Trung An", "Trung Lập Hạ", "Trung Lập Thượng"],
+    "Huyện Hóc Môn": ["Bà Điểm", "Đông Thạnh", "Nhị Bình", "Tân Hiệp", "Tân Thới Nhì", "Tân Xuân", "Thới Tam Thôn", "Trung Chánh", "Xuân Thới Đông", "Xuân Thới Sơn", "Xuân Thới Thượng"],
+    "Huyện Nhà Bè": ["Hiệp Phước", "Long Thới", "Nhà Bè", "Nhơn Đức", "Phú Xuân", "Phước Kiển", "Phước Lộc"],
   };
 
   useEffect(() => {
@@ -57,7 +83,11 @@ export default function HotelSearchPage() {
             : [];
 
         setAllHotels(hotelsData);
-        setHotels(hotelsData);
+
+        // Mặc định load Hồ Chí Minh
+        const filteredHotels = hotelsData.filter((hotel) => hotel.city === "TP. HCM");
+        setHotels(filteredHotels);
+        setCity("TP. HCM");
       } catch (error) {
         console.error("Lỗi gọi API getAllHotels:", error);
         setError("Không thể tải danh sách khách sạn");
@@ -110,6 +140,7 @@ export default function HotelSearchPage() {
               setDistrict("");
               setWard("");
             }}
+            style={{ maxHeight: "300px", overflowY: "auto" }}
           >
             <option value="">Chọn Tỉnh/Thành</option>
             {Object.keys(districtsData).map((c) => (
@@ -125,6 +156,7 @@ export default function HotelSearchPage() {
               setDistrict(e.target.value);
               setWard("");
             }}
+            style={{ maxHeight: "300px", overflowY: "auto" }}
           >
             <option value="">Chọn Quận/Huyện</option>
             {districtsData[city]?.map((d) => (
@@ -137,6 +169,7 @@ export default function HotelSearchPage() {
           <select
             value={ward}
             onChange={(e) => setWard(e.target.value)}
+            style={{ maxHeight: "300px", overflowY: "auto" }}
           >
             <option value="">Chọn Phường/Xã</option>
             {wardsData[district]?.map((w) => (
@@ -159,18 +192,26 @@ export default function HotelSearchPage() {
           {!loading &&
             !error &&
             hotels.map((hotel) => (
-              <div className="hotel-card" key={hotel.id}>
+              <div 
+                className={`hotel-card ${hotel.availableRooms === 0 ? 'sold-out' : ''}`} 
+                key={hotel.id}
+                onClick={() => navigate(`/rooms?hotelId=${hotel.hotelId}`)} // ✅ Khi click chuyển sang trang phòng
+              >
                 <img
                   src={hotel.images}
                   alt={hotel.hotelName || hotel.name}
                 />
+                {hotel.availableRooms === 0 && (
+                  <div className="sold-out-overlay">
+                    <span className="sold-out-text">HẾT PHÒNG</span>
+                  </div>
+                )}
                 <div className="hotel-info">
                   <div className="hotel-name">
                     {hotel.hotelName || hotel.name}
                   </div>
                   <div className="hotel-rating">
-                    {renderStars(hotel.rating || 0)} (
-                    {hotel.rating || 0}/5)
+                    {renderStars(hotel.rating || 0)} ({hotel.rating || 0}/5)
                   </div>
                   <div className="hotel-desc">
                     {hotel.description || "Không có mô tả"}
@@ -179,6 +220,15 @@ export default function HotelSearchPage() {
                     {hotel.ward && hotel.district && hotel.city
                       ? `Phường ${hotel.ward}, Quận ${hotel.district}, ${hotel.city}`
                       : hotel.address || "Địa chỉ không có sẵn"}
+                  </div>
+                  <div className="room-availability">
+                    {hotel.availableRooms === 0 ? (
+                      <span className="no-rooms">Khách sạn đã hết phòng</span>
+                    ) : (
+                      <span className="available-rooms">
+                        Còn {hotel.availableRooms} phòng trống
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

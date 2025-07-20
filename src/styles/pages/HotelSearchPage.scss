@@ -211,4 +211,47 @@
 // Reset CSS và thiết lập cuộn
 * {
   box-sizing: border-box;
+}.hotel-card {
+  position: relative;
+  
+  &.sold-out {
+    opacity: 0.7;
+    
+    .hotel-info {
+      .hotel-name {
+        color: #999;
+      }
+    }
+  }
+}
+
+.sold-out-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 0, 0, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  z-index: 10;
+  
+  .sold-out-text {
+    font-size: 12px;
+  }
+}
+
+.room-availability {
+  margin-top: 10px;
+  font-size: 14px;
+  
+  .no-rooms {
+    color: #ff4444;
+    font-weight: bold;
+  }
+  
+  .available-rooms {
+    color: #28a745;
+    font-weight: 500;
+  }
 }

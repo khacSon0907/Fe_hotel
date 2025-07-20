@@ -10,8 +10,8 @@ export default function Footer() {
         {/* Logo + dòng đầu */}
         <div className="footer-top">
           <div className="footer-logo">
-            <h2>traveloka</h2>
-            <p>© 2025 Traveloka Vietnam</p>
+            <h2>Hotel Luxury</h2>
+            <p>© 2025 Luxury Vietnam</p>
           </div>
         </div>
 

@@ -1,0 +1,62 @@
+.booking-history-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    text-align: center;
+    color: #00695c;
+    margin-bottom: 24px;
+  }
+
+  p {
+    text-align: center;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+
+  .booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+
+    th,
+    td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color:#00695c;
+      color: #000000;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    .btn-cancell {
+      background-color: red;
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer; /* Gợi ý thêm để có tay trỏ */
+    }
+
+    .btn-cancell:hover {
+      background-color: rgb(79, 42, 42);
+    }
+
+  }
+
+  .loading {
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+  }
+}

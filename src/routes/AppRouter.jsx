@@ -13,6 +13,12 @@ import CreateHotel from "../pages/admin/CreateHotel";
 import BookingRoom from '../pages/hotel/BookingRoom'
 import { getCurrentUser } from "../services/useService";
 import { setUser, clearUser } from "../store/userSlice"
+import CreateRoom from '../pages/admin/CreateRoom'
+import ListRoom from "../pages/rooms/ListRoom";
+import Booking from "../pages/rooms/Booking";
+import BookingHistoryPage from '../pages/Booking/BookingHistoryPage ';
+import BookingManagementPage from "../pages/admin/BookingManagementPage ";
+
 export default function AppRouter() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
@@ -52,6 +58,9 @@ export default function AppRouter() {
           <Route path="/" element={<Home />} />
           <Route path="/search-hotel" element={<HotelSearchPage />} />
           <Route path="/hotel" element={<BookingRoom/>} />
+          <Route path="/rooms" element={<ListRoom />} />
+          <Route path="/booking" element={<Booking/>} />
+          <Route path="/booking-history" element={<BookingHistoryPage />} />
         </Route>
 
         {/* Auth */}
@@ -69,6 +78,8 @@ export default function AppRouter() {
           }
         >
           <Route path="hotels" element={<CreateHotel />} />
+          <Route path="rooms" element={<CreateRoom />} />
+          <Route path="booking-rooms" element={<BookingManagementPage/>} />
         </Route>
       </Routes>
     </BrowserRouter>

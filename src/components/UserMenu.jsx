@@ -20,6 +20,11 @@ export default function UserMenu() {
     handleClose();
   };
 
+  const handleBookingHistory = () => {
+    navigate("/booking-history");
+    handleClose();
+  };
+
   const handleChangePassWord = () => {
     navigate("/change-password");
     handleClose();
@@ -35,7 +40,6 @@ export default function UserMenu() {
     handleClose();
   };
 
-
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     window.location.reload();
@@ -45,7 +49,6 @@ export default function UserMenu() {
     navigate("/login");
   };
 
-  // Bấm ngoài menu thì đóng
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -86,6 +89,11 @@ export default function UserMenu() {
             <li onClick={handleProfile}>
               <i className="fas fa-user"></i> Hồ sơ
             </li>
+
+            <li onClick={handleBookingHistory}>
+              <i className="fas fa-clipboard-list"></i> Lịch sử đặt phòng
+            </li>
+
             {user?.authProvider !== "GOOGLE" && (
               <li onClick={handleChangePassWord}>
                 <i className="fas fa-lock"></i> Đổi mật khẩu
