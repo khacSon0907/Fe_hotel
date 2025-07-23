@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { getAllBookingsForAdmin, updateBookingStatus } from "../../services/BookingService";
+import {
+  getAllBookingsForAdmin,
+  updateBookingStatus,
+} from "../../services/BookingService";
 import "../../styles/pages/BookingManagementPage.scss";
 
 export default function BookingManagementPage() {
@@ -13,6 +16,8 @@ export default function BookingManagementPage() {
   const fetchBookings = async () => {
     try {
       const res = await getAllBookingsForAdmin();
+      console.log(" res", res);
+
       if (res?.success) {
         setBookings(res.data);
       } else {
@@ -27,7 +32,12 @@ export default function BookingManagementPage() {
   };
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
-    if (!window.confirm(`Bạn có chắc muốn cập nhật trạng thái thành: ${newStatus}?`)) return;
+    if (
+      !window.confirm(
+        `Bạn có chắc muốn cập nhật trạng thái thành: ${newStatus}?`
+      )
+    )
+      return;
 
     try {
       const res = await updateBookingStatus(bookingId, newStatus);
@@ -43,7 +53,8 @@ export default function BookingManagementPage() {
     }
   };
 
-  if (loading) return <div className="booking-loading">Đang tải dữ liệu...</div>;
+  if (loading)
+    return <div className="booking-loading">Đang tải dữ liệu...</div>;
 
   return (
     <div className="booking-admin-container">
@@ -79,7 +90,12 @@ export default function BookingManagementPage() {
                   {item.roomName} <br />
                   <small>{item.roomType}</small>
                 </td>
-                <td>{item.userName}</td>
+                <td>
+                  <strong>Tên: {item.userName}</strong> <br />
+                  <small>SĐT: {item.phoneNumber}</small> <br />
+                  <small>CCCD: {item.identityNumber}</small>
+                </td>
+
                 <td>{new Date(item.checkInDate).toLocaleString()}</td>
                 <td>{new Date(item.checkOutDate).toLocaleString()}</td>
                 <td>{item.paymentMethod}</td>
@@ -93,7 +109,9 @@ export default function BookingManagementPage() {
                   <select
                     className="status-dropdown"
                     value={item.status}
-                    onChange={(e) => handleUpdateStatus(item.bookingId, e.target.value)}
+                    onChange={(e) =>
+                      handleUpdateStatus(item.bookingId, e.target.value)
+                    }
                     disabled={["CANCELLED", "COMPLETED"].includes(item.status)}
                   >
                     <option value="PENDING">🕒 Chờ xử lý</option>

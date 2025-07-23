@@ -1,10 +1,10 @@
-import '../../styles/pages/Booking.scss';
-import { createBooking } from '../../services/BookingService';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import "../../styles/pages/Booking.scss";
+import { createBooking } from "../../services/BookingService";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, clearUser } from "../../store/userSlice";
-import { getCurrentUser } from "../../services/useService";
+import { getCurrentUser, updateUserInfo } from "../../services/useService";
 
 export default function Booking() {
   const location = useLocation();
@@ -15,7 +15,6 @@ export default function Booking() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { room, hotelId } = location.state || {};
-
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [customerNote, setCustomerNote] = useState("");
@@ -35,11 +34,9 @@ export default function Booking() {
             dispatch(setUser(res.data));
           } else {
             dispatch(clearUser());
-            console.warn("Token không hợp lệ.");
           }
         })
-        .catch((err) => {
-          console.error("Lỗi get user:", err);
+        .catch(() => {
           dispatch(clearUser());
         })
         .finally(() => setLoading(false));
@@ -49,60 +46,45 @@ export default function Booking() {
     }
   }, [dispatch]);
 
-  // Function để lấy thời gian hiện tại theo định dạng datetime-local
   const getCurrentDateTime = () => {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return now.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
   };
 
-  // Function để lấy ngày tối thiểu cho checkout (ngày hôm sau của check-in)
   const getMinCheckOutDate = () => {
     if (!checkInDate) return getCurrentDateTime();
-    
     const checkIn = new Date(checkInDate);
-    // Lấy ngày hôm sau, giờ có thể sớm hơn giờ check-in
     const nextDay = new Date(checkIn);
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay.setHours(0, 0); // Set về đầu ngày hôm sau
-    
-    const year = nextDay.getFullYear();
-    const month = String(nextDay.getMonth() + 1).padStart(2, '0');
-    const day = String(nextDay.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}T00:00`;
+    nextDay.setDate(checkIn.getDate() + 1);
+    nextDay.setHours(0, 0);
+    return nextDay.toISOString().slice(0, 16);
   };
 
-  // Validate và cập nhật check-out date khi check-in date thay đổi
   const handleCheckInChange = (e) => {
     const newCheckInDate = e.target.value;
     setCheckInDate(newCheckInDate);
-    
-    // Nếu ngày trả phòng đã được chọn và cùng ngày với ngày nhận
+
     if (checkOutDate && newCheckInDate) {
       const checkIn = new Date(newCheckInDate);
       const checkOut = new Date(checkOutDate);
-      
-      // Nếu checkout cùng ngày hoặc trước ngày checkin
-      if (checkOut.toDateString() === checkIn.toDateString() || checkOut < checkIn) {
-        // Tự động set ngày trả phòng = ngày hôm sau
+      if (checkOut <= checkIn) {
         const nextDay = new Date(checkIn);
-        nextDay.setDate(nextDay.getDate() + 1);
-        nextDay.setHours(12, 0); // Set checkout mặc định 12:00 trưa hôm sau
-        
-        const year = nextDay.getFullYear();
-        const month = String(nextDay.getMonth() + 1).padStart(2, '0');
-        const day = String(nextDay.getDate()).padStart(2, '0');
-        setCheckOutDate(`${year}-${month}-${day}T12:00`);
+        nextDay.setDate(checkIn.getDate() + 1);
+        nextDay.setHours(12, 0);
+        setCheckOutDate(nextDay.toISOString().slice(0, 16));
       }
     }
   };
 
   if (loading) return <div>Loading...</div>;
   if (!room || !hotelId) return <div>❌ Không có dữ liệu phòng được chọn.</div>;
+
+  const totalNights =
+    checkInDate && checkOutDate
+      ? Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24))
+      : 0;
+
+  const totalPrice = totalNights * room.pricePerNight;
 
   const handleConfirmBooking = async () => {
     if (!user || !user.id) {
@@ -115,7 +97,6 @@ export default function Booking() {
       return;
     }
 
-    // Validate dates
     const now = new Date();
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
@@ -125,37 +106,47 @@ export default function Booking() {
       return;
     }
 
-    // Kiểm tra checkout phải khác ngày với checkin (qua đêm)
-    if (checkOut.toDateString() === checkIn.toDateString()) {
-      alert("❗ Ngày trả phòng phải khác ngày với ngày nhận phòng (tối thiểu 1 đêm)!");
-      return;
-    }
-
     if (checkOut <= checkIn) {
       alert("❗ Ngày trả phòng phải sau ngày nhận phòng!");
       return;
     }
 
-    const bookingData = {
-      hotelId,
-      roomId: room.roomId,
-      userId: user?.id,
-      checkInDate,
-      checkOutDate,
-      totalPrice: room.pricePerNight,
-      status: "PENDING",
-      paymentMethod,
-      customerNote
-    };
+    if (!user.phoneNumber || !user.identityNumber) {
+      alert("❗ Vui lòng nhập số điện thoại và CCCD!");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
-      const res = await createBooking(bookingData);
+
+      // ✅ 1. Gọi API update user info
+      const res1 = await updateUserInfo({
+        phoneNumber: user.phoneNumber,
+        identityNumber: user.identityNumber,
+      });
+      console.log("res1", res1);
+
+      // ✅ 2. Gọi API tạo booking
+      const bookingData = {
+        hotelId,
+        roomId: room.roomId,
+        userId: user.id,
+        checkInDate,
+        checkOutDate,
+        totalPrice: totalPrice,
+        status: "PENDING",
+        paymentMethod,
+        customerNote,
+      };
+
+      const res2 = await createBooking(bookingData);
+
       alert("✅ Đặt phòng thành công!");
-      console.log("Booking response:", res.data);
+      console.log("res2", res2);
+
       navigate("/");
     } catch (err) {
-      console.error("❌ Lỗi đặt phòng:", err);
+      console.error("❌ Lỗi:", err);
       alert("❌ Đặt phòng thất bại!");
     } finally {
       setIsSubmitting(false);
@@ -178,6 +169,28 @@ export default function Booking() {
           <h4>Thông tin khách hàng</h4>
           <p><strong>Tên khách:</strong> {user?.fullname}</p>
           <p><strong>Email:</strong> {user?.email}</p>
+
+          <div className="form-group">
+            <label>Số điện thoại:</label>
+            <input
+              type="text"
+              value={user?.phoneNumber || ""}
+              onChange={(e) =>
+                dispatch(setUser({ ...user, phoneNumber: e.target.value }))
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Căn cước công dân (CCCD):</label>
+            <input
+              type="text"
+              value={user?.identityNumber || ""}
+              onChange={(e) =>
+                dispatch(setUser({ ...user, identityNumber: e.target.value }))
+              }
+            />
+          </div>
 
           <div className="form-group">
             <label>Nhận phòng:</label>
@@ -223,7 +236,9 @@ export default function Booking() {
               onChange={(e) => setPaymentMethod(e.target.value)}
             >
               {paymentOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
@@ -238,7 +253,10 @@ export default function Booking() {
       </div>
 
       <div className="total-row">
-        <strong>Tổng cộng:</strong> {room.pricePerNight.toLocaleString()} VNĐ
+        <strong>Tổng cộng:</strong>{" "}
+        {checkInDate && checkOutDate
+          ? `${totalNights} đêm × ${room.pricePerNight.toLocaleString()} = ${totalPrice.toLocaleString()} VNĐ`
+          : "0 VNĐ"}
       </div>
 
       <div className="confirm-button">
@@ -249,3 +267,4 @@ export default function Booking() {
     </div>
   );
 }
+  

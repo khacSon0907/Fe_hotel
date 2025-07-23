@@ -1,12 +1,44 @@
 import { useEffect, useState } from "react";
-import { getBookingsByUserId } from '../../services/BookingService';
+import { getBookingsByUserId } from "../../services/BookingService";
 import { useSelector } from "react-redux";
-import '../../styles/pages/BookingHistoryPage.scss';
+import { updateBookingStatus } from "../../services/BookingService";
+import "../../styles/pages/BookingHistoryPage.scss";
 
 export default function BookingHistoryPage() {
   const user = useSelector((state) => state.user.user);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleCancell = async (bookingId, currentStatus) => {
+    if (currentStatus === "CANCELLED") {
+      alert("❗ Booking này đã bị huỷ trước đó.");
+      return;
+    }
+
+    const confirm = window.confirm("Bạn có chắc muốn huỷ booking này?");
+    if (!confirm) return;
+
+    try {
+      const res = await updateBookingStatus(bookingId, "CANCELLED");
+      if (res?.success) {
+        alert("✅ Huỷ booking thành công!");
+
+        // Cập nhật lại danh sách booking
+        setBookings((prev) =>
+          prev.map((item) =>
+            item.bookingId === bookingId
+              ? { ...item, status: "CANCELLED" }
+              : item
+          )
+        );
+      } else {
+        alert("❌ Không thể huỷ booking. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi huỷ booking:", error);
+      alert("❌ Lỗi server. Không thể huỷ booking.");
+    }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -63,9 +95,13 @@ export default function BookingHistoryPage() {
                 <td>{item.note || "Không có"}</td>
                 <td>{item.status}</td>
                 <td>
-                 <button className="btn-cancell">
-                    Huỷ
-                 </button>
+                  <button
+                    className="btn-cancell"
+                    onClick={() => handleCancell(item.bookingId,item.status )}
+                    disabled={item.status === "CANCELLED"}
+                  >
+                    {item.status === "CANCELLED" ? "Đã huỷ" : "Huỷ"}
+                  </button>
                 </td>
               </tr>
             ))}

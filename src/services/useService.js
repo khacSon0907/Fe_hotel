@@ -28,3 +28,9 @@ export const loginWithGoogle = (idToken) => {
     }
   );
 };
+
+
+
+export const updateUserInfo = (data) => {
+  return axiosClient.put("users/update-info", data);
+};
